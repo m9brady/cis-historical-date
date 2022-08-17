@@ -16,15 +16,15 @@ POSSIBLE_DATE_FMTS = [
     '%Y%m%d', '%Y-%m-%d', '%Y/%m/%d', '%m/%d/%Y'
 ]
 
-def parse_date(date_str: str):
+def parse_date(date_str: str) -> datetime:
     for fmt in POSSIBLE_DATE_FMTS:
         try:
             return datetime.strptime(date_str, fmt)
         except ValueError:
             pass
-    raise ValueError('Could not parse chart date with any expected date format')
+    raise ValueError(f'Could not parse chart date {date_str!r} with any expected date format')
 
-def calc_historical_date(chart_date: str):
+def calc_historical_date(chart_date: str) -> str:
     '''
     Given a chart date (expected as YYYYMMDD string), return the CIS "historical chart" value
     
@@ -37,8 +37,8 @@ def calc_historical_date(chart_date: str):
     chart_dt = parse_date(chart_date)
     # CIS treats Feb 29 as Feb 28 as per sea_ice_area_table_format_description.txt line 1222
     if chart_dt.month == 2 and chart_dt.day == 29:
-        chart_dt = datetime.strptime(chart_dt.strftime('%Y%m28'), '%Y%m%d')
-    # compile the list of possible hist_date matches for
+        chart_dt = datetime(chart_dt.year, 2, 28)
+    # compile the list of possible hist_date matches for the given year
     hist_dates = [
         datetime(chart_dt.year, int(d[:2]), int(d[2:]))
         for d in HIST_DATES
